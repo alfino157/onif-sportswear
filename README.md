@@ -1,7 +1,7 @@
 # onif-sportswear
 https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
 
-# Cara implementasi checklist tugas secara step by step
+# 1. Cara implementasi checklist tugas secara step by step
 1. Membuat folder baru bernama onif-sportswear
 2. Membuat dan menjalankan virtual environment pada terminal directory tersebut dengan python -m venv env dan env\Scripts\activate
 3. Menambahkan beberapa dependencies yang diperlukan, seperti library, package, dan framework tertentu dengan membuat file requirements.txt dan mengisi dependencies yang dibutuhkan
@@ -33,6 +33,20 @@ https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
 29. Menkonfigurasi routing URL proyek agar dapat memetekana url aplikasi main dengan memodifikasi urls.py pada directory project dan impor fungsi include dari django.urls dengan from django.urls import path, include
 30. Menambahkan rute url path('', include('main.urls')), pada urlpatterns untuk rute aplikasi main
 31. Melakukan git add, commit, dan push kode ke github lalu melakukan push pws kembali untuk mengubah kode pada website PWS.
+
+# 2. Bagan request client ke web aplikasi 
+
+
+# 3. Peran settings.py dalam proyek Django
+
+# 4. Cara kerja migrasi databse di Django
+
+
+# 5. Alasan framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak
+Menurut saya pribadi, framework Django cocok untuk dijadikan permulaan pembelajaran pengembangan perangkat lunak karena memakai struktur yang mudah dipahami, yaitu memakai konsep MVT (Model, View, Template). Bagi saya, struktur tersebut membantu dalam pembuatan kode yang lebih readable, modular, dan juga scalable untuk projek atau aplikasi yang akan dibuat kedepannya. Selain struktur MVT tersebut, alasan lain adalah mungkin karena Django juga memakai bahasa pemrograman Python yang memiliki sintaks yang lebih mudah dipahami dan juga lebih familiar karena kita sudah pernah menggunakannya pada mata kuliah DDP 1. 
+
+# 6. Feedback untuk asdos
+Peran asisten dosen saat tutorial 1 sudah sangat bagus dalam membantu pengerjaan tutorial dengan adanya help center di VC discord. File tutorial pada web PBP juga mudah dipahami dan disertai penjelasan yang mendukung.
 
 
 
