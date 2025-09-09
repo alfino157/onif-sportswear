@@ -1,4 +1,4 @@
-# Tugas 1 
+# Tugas 2
 Alfino Ahmad Feriza - 2406405304 - PBP C
 
 URL PWS : https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
