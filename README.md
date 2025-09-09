@@ -1,4 +1,6 @@
-# onif-sportswear
+# Tugas 1 
+Alfino Ahmad Feriza - 2406405304 - PBP C
+
 https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
 
 # 1. Cara implementasi checklist tugas secara step by step
@@ -38,14 +40,27 @@ https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
 
 
 # 3. Peran settings.py dalam proyek Django
+settings.py berperan sebagai file utama yang melakukan konfigurasi proyek Django yang ingin kita buat.
+Beberapa jenis konfigurasi yang dapat dilakukan adalah sebagai berikut.
+- Security: SECRET_KEY, DEBUG, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS.
+- Aplikasi: INSTALLED_APPS.
+- Middleware : MIDDLEWARE.
+- Template & static files: TEMPLATES['DIRS'], STATIC_URL, STATICFILES_DIRS, STATIC_ROOT, MEDIA_URL, MEDIA_ROOT.
+- Database: DATABASES (SQLite/PostgreSQL/MySQL)
+- Internasionalisasi: LANGUAGE_CODE, TIME_ZONE, USE_TZ.
+- Validasi password: AUTH_PASSWORD_VALIDATORS
 
-# 4. Cara kerja migrasi databse di Django
-
+# 4. Cara kerja migrasi database di Django
+Migrasi adalah proses instruksi yang perlu dijalankan untuk mengubah struktur database berdasarkan perubahan yang dibuat pada model yang didefinisikan pada kode terbaru kita.
+Cara kerja migrasi model adalah sebagai berikut.
+1. Memodifikasi models.py
+2. Menjalankan perintah python manage.py makemigrations pada terminal untuk membuat file migrasi, tetapi belum mengaplikasikan perubahannya pada database.
+3. Menjalankan perintah python manage.py migrate pada terminal untuk menerapkan migrasi tersebut ke dalam database. 
 
 # 5. Alasan framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak
 Menurut saya pribadi, framework Django cocok untuk dijadikan permulaan pembelajaran pengembangan perangkat lunak karena memakai struktur yang mudah dipahami, yaitu memakai konsep MVT (Model, View, Template). Bagi saya, struktur tersebut membantu dalam pembuatan kode yang lebih readable, modular, dan juga scalable untuk projek atau aplikasi yang akan dibuat kedepannya. Selain struktur MVT tersebut, alasan lain adalah mungkin karena Django juga memakai bahasa pemrograman Python yang memiliki sintaks yang lebih mudah dipahami dan juga lebih familiar karena kita sudah pernah menggunakannya pada mata kuliah DDP 1. 
 
-# 6. Feedback untuk asdos
+# 6. Feedback untuk asisten dosen
 Peran asisten dosen saat tutorial 1 sudah sangat bagus dalam membantu pengerjaan tutorial dengan adanya help center di VC discord. File tutorial pada web PBP juga mudah dipahami dan disertai penjelasan yang mendukung.
 
 
