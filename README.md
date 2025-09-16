@@ -112,6 +112,16 @@ csrf_token sangat penting dan dibutuhkan dalam pembuatan form di Django agar ser
 ## Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
 Dari segi materi, materi yang ada pada tutorial 2 PBP sudah sangat membantu dalam pengerjaan tugas ini. Mungkin menurut saya pribadi, tutorial kurang memberi tahu kita mengenai syntax-syntax dan penjelasan mengenai file html secara dasar sehingga kita harus belajar dari luar untuk penggunaan kode html. Postman juga tidak dijelaskan fungsi dan kegunannya apa. Dari segi ketersedian asdos pada sesi tutorial, menurut saya sudah sangat baik karena meskipun online, pada asdos tetap standby pada VC dan discord dan membantu mahasiswa yang membutuhkan. :D
 
+## Screenshot hasil Postman
+<img width="1911" height="887" alt="image" src="https://github.com/user-attachments/assets/09037d74-e725-4f3e-94f0-d2416c3d8360" />
+<img width="1910" height="920" alt="image" src="https://github.com/user-attachments/assets/1b6cd22a-62fe-48d5-bb79-6d5903b4a208" />
+<img width="1920" height="922" alt="image" src="https://github.com/user-attachments/assets/ba8c49a3-4c06-4940-b76f-13c5d99cd27b" />
+<img width="1914" height="925" alt="image" src="https://github.com/user-attachments/assets/e59137f3-9525-4c7c-b7e6-a2de0eb58582" />
+
+
+
+
+
 
 
 
