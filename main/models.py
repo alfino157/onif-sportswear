@@ -12,6 +12,7 @@ class Product(models.Model):
     ]
 
     #name price desc thumb cat isfield
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
     description = models.TextField()
@@ -23,11 +24,3 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
-    
-    # @property
-    # def is_news_hot(self):
-    #     return self.news_views > 20
-        
-    # def increment_views(self):
-    #     self.news_views += 1
-    #     self.save()
