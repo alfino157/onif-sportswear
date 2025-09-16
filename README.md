@@ -70,7 +70,47 @@ Menurut saya pribadi, framework Django cocok untuk dijadikan permulaan pembelaja
 ## 6. Feedback untuk asisten dosen
 Peran asisten dosen saat tutorial 1 sudah sangat bagus dalam membantu pengerjaan tutorial dengan adanya help center di VC discord. File tutorial pada web PBP juga mudah dipahami dan disertai penjelasan yang mendukung.
 
+# Tugas 3 
 
+## Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+Kita memerlukan data delivery dalam mengimplementasikan sebuah platform karena data delivery adalah konsep pemindahan data dari satu stack ke stack lainnya. Dalam hal ini, ketika kita sedang mengembangkan sebuah aplikasi web dan ingin mengirimkan suatu data dari backend ke frontend, data tersebut harus dikemas dalam format tertentu agar bisa dipahami. Beberapa contoh markup language yang biasa digunakan adalah HTML, XML, ataupun JSON.
+
+## Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+Menurut saya pribadi, secara visual, kode XML umumnya lebih rumit dan sulit dibaca dibandingkan markup language JSON. XML umumnya banyak menggunakan tag pembuka dan penutup '< >' sehingga filenya lebih panjang dan terkadang sulit dibaca dibandingkan JSON yang tidak menggunakan tag tersebut. Ditambah lagi, dengan banyak web yang menggunakan Javascripts, JSON lebih praktis untuk digunakan karena bisa langsung dipakai tanpa perlu parsing seperti XML. Dengan demikian, secara tidak langusung, JSON lebih populer digunakan dibandingkan XML karena lebih ringkas, mudah dibaca, dan bisa langsung dipakai pada Javascripts tanpa perlu parsing khusus.
+
+## Jelaskan fungsi dari method is_valid() pada form Django dan mengapa kita membutuhkan method tersebut?
+method is_valid() pada form Django berfungsi sebagai method yang memvalidasi input form yang dimasukkan oleh pengguna, contohnya seperti angka negatif pada field bilangan bulat ataupun panjang teks yang tidak sesuai. Method ini sangat penting untuk diimplementasikan karena jika ada input pada forms yang tidak valid, maka database dapat error karena telah memasukkan data yang tidak tervalidasi. Dari segi keamanan juga, input forms yang tidak tervalidasi dapat terancam oleh SQLinjection jika tidak ditangani dengan baik.
+
+## Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+csrf_token sangat penting dan dibutuhkan dalam pembuatan form di Django agar server web yang kita gunakan dapat memvalidasi dan memastikan request form yang ada itu benar benar datang dari halaman web kita bukan dari situs yang berbahaya. Contohnya, ketika kita sedang mengakses situs web yang jahat, situs tersebut bisa saja mengirimkan request ke form pada web lainnya yang sedang kita gunakan. Hal ini bisa mengancam data kita dalam situs web tersebut dan bisa saja melakukan tindakan yang menghapus ataupun mengambil kepemilikan pribadi kita. Dengan adanya csrf_token, ketika kita mengakses form pada web, web akan membuat token unik yang hanya bisa diakses oleh web kita. Dengan demikian, penyerang tidak bisa sembarangan membuat request palsu pada form di website tersebut dan data kita akan aman dari serangan tersebut.
+
+## Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+1. Membuat berkas html bernama base.html pada root folder onif-sportswear sebagai template untuk kode html yang digunakan selanjutnya
+2. Mengupdate bagian DIRS pada settings.py agar dapat mendeteksi base.html sebagai template html yang digunakan pada project
+3. Mengupdate main.html pada directory main agar menyesuaikan base.html yang dibuat
+4. Membuat berkas forms.py pada directory main untuk struktur form yang dapat menerima data Products yang baru dengan ketentuan sebagai berikut. Mengimport ModelForm dari django.forms dan Product pada main.models, Mmebuat class ProductForm dengan parameter Modelform dan sub class Meta dengan attributes variabel model = Products dan list fields sesuai field yang ada pada models.
+5. Membuat fungsi create_product dengan parameter request, lalu membuat varible form baru dengan NewsForm(request.POST or None), lalu memvalidasi isi form tersebut dan redirect ke fungsi 'show_main' jika valid. Default fungsi akan melakukan render terhadap tampilan create_product html dan context sesuai form yang diisi.
+6. Membuat fungsi show_product dengan parameter request dan id, lalu membuat variable product dengan get_object_or_404(Product, pk=id). Fungsi akan return render tampilan product_detail.html sesuai context product dengan return render(request, "product_detail.html", context)
+7. Mengimport create_product dan show_product pada urls.py
+8. Menambahkan urlpatterns baru berdasarkan fungsi baru views.py yang telah dibuat pada urls.py directory main
+9. Memodifikasi main.html dengan <button>+ Add Product</button> untuk menampilkan button Add product pada web, if conditionals untuk melihat product_list ada atau tidak dan menampilkan "Belum ada product pada Onif Sportswear." apabila tidak ada. (Tampilan halaman main)
+10. Menambahkan tampilan semua product pada product_list dan menambahkan tampilan product name, category, featured atau tidak, thumbnail, brand, price, dan stocknya jika product_list ada.
+11. Membuat file create_product.html dengan {% csrf_token %} sebagai security dan juga {{ form.as_table }} sebagai template tag yang menampilkan fields model pada forms.py sebagai sebuah table. (Tampilan halaman form)
+12. Membuat file product_detail.html sebagai tampilan halaman detail yang menampilkan nama produk, category, featured atau tidak, thumbnail, brand, price, stock, dan descriptionnya
+13. Memodifikasi settings.py pada root project onif-sportswear dan menambahkan list CSRF_TRUSTED_ORIGINS dengan isi web pws "https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/"
+14. Menambahkan import HttpResponse dan Serialzers pada views.py directory main
+15. Membuat fungsi show_xml dengan parameter request yang melakukan parsing objects model dengan serializers menjadi xml dan mereturn httresponse dengan data xml tersebut serta content_type "application/xml"
+16. Membuat fungsi show_json dengan parameter request yang melakukan parsing objects model dengan serializers menjadi json dan mereturn httresponse dengan data json tersebut serta content_type "application/json"
+17. Mengimport fungsi show_xml dan show_json pada main.views
+18. Menambahkan path url ke dalam url patterns untuk mengakses fungsi show_xml dan show_json tersebut
+19. Menambahkan fungsi show_xml_by_id pada views.py dengan parameter request, variabel product_item = Product.objects.filter(pk=product_id) untuk menyimpan hasil query dari data dengan id tertentu pada models, dan melakukan parsing objects model dengan serializers menjadi xml. Fungsi mereturn httresponse dengan data xml tersebut serta content_type "application/xml"
+20. Menambahkan fungsi show_json_by_id pada views.py dengan parameter request, variabel product_item = Product.objects.filter(pk=product_id) untuk menyimpan hasil query dari data dengan id tertentu pada models, dan melakukan parsing objects model dengan serializers menjadi json. Fungsi mereturn httresponse dengan data json tersebut serta content_type "application/json"
+21. Memodifikasi show_json_by_id dan show_xml_by_id dengan menambahkan try except pada fungsi sehingga jika data tidak ditemukan akan mereturn httpresponse dengan status 404.
+22. Mengimport kedua fungsi show_json_by_id dan show_xml_by_id pada urls.py
+23. Menambahkan path url dalam urlpatters di urls.py untuk menampilkan kedua fungsi
+
+## Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
+Dari segi materi, materi yang ada pada tutorial 2 PBP sudah sangat membantu dalam pengerjaan tugas ini. Mungkin menurut saya pribadi, tutorial kurang memberi tahu kita mengenai syntax-syntax dan penjelasan mengenai file html secara dasar sehingga kita harus belajar dari luar untuk penggunaan kode html. Postman juga tidak dijelaskan fungsi dan kegunannya apa. Dari segi ketersedian asdos pada sesi tutorial, menurut saya sudah sangat baik karena meskipun online, pada asdos tetap standby pada VC dan discord dan membantu mahasiswa yang membutuhkan. :D
 
 
 
