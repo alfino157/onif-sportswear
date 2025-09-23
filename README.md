@@ -1,9 +1,11 @@
-# Tugas 2
 Alfino Ahmad Feriza - 2406405304 - PBP C
 
 URL PWS : https://alfino-ahmad-footballshop.pbp.cs.ui.ac.id/
 
-## 1. Cara implementasi checklist tugas secara step by step
+<details>
+  <summary> Tugas 2 </summary>
+
+  ## 1. Cara implementasi checklist tugas secara step by step
 1. Membuat folder baru bernama onif-sportswear.
 2. Membuat dan menjalankan virtual environment pada terminal directory tersebut dengan _**python -m venv env dan env\Scripts\activate**_.
 3. Menambahkan beberapa dependencies yang diperlukan, seperti library, package, dan framework tertentu dengan membuat file requirements.txt dan mengisi dependencies yang dibutuhkan.
@@ -70,7 +72,12 @@ Menurut saya pribadi, framework Django cocok untuk dijadikan permulaan pembelaja
 ## 6. Feedback untuk asisten dosen
 Peran asisten dosen saat tutorial 1 sudah sangat bagus dalam membantu pengerjaan tutorial dengan adanya help center di VC discord. File tutorial pada web PBP juga mudah dipahami dan disertai penjelasan yang mendukung.
 
-# Tugas 3 
+</details>
+
+
+
+<details> 
+<summary> Tugas 3 </summary>
 
 ## Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
 Kita memerlukan data delivery dalam mengimplementasikan sebuah platform karena data delivery adalah konsep pemindahan data dari satu stack ke stack lainnya. Dalam hal ini, ketika kita sedang mengembangkan sebuah aplikasi web dan ingin mengirimkan suatu data dari backend ke frontend, data tersebut harus dikemas dalam format tertentu agar bisa dipahami. Beberapa contoh markup language yang biasa digunakan adalah HTML, XML, ataupun JSON.
@@ -117,6 +124,63 @@ Dari segi materi, materi yang ada pada tutorial 2 PBP sudah sangat membantu dala
 <img width="1910" height="920" alt="image" src="https://github.com/user-attachments/assets/1b6cd22a-62fe-48d5-bb79-6d5903b4a208" />
 <img width="1920" height="922" alt="image" src="https://github.com/user-attachments/assets/ba8c49a3-4c06-4940-b76f-13c5d99cd27b" />
 <img width="1914" height="925" alt="image" src="https://github.com/user-attachments/assets/e59137f3-9525-4c7c-b7e6-a2de0eb58582" />
+
+</details>
+
+# Tugas 4 
+
+## Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya.
+
+Django AuthenticationForm adalah form bawaan dari Django yang dapat kita import melalui django.contrib.auth.forms dan digunakan sebagai form untuk autentikasi login pengguna. Form ini memiliki 2 field input yaitu username dan password. Kelebihan dari Django AuthenticationForm adalah form ini langsung siap pakai sehingga kita tidak perlu susah-susah membuat form login sendiri dan tinggal import dari Django. Selain itu, AuthenticationForm juga sudah memiliki tingkat keamanan awal yang baik sehingga autentikasi pengguna dapat berjalan secara aman, seperti fitur password hashing dan validasi. Namun, kelemahan dari AuthenticationForm adalah form ini memiliki fitur yang sangat basic dan minimal, cuman ada username dan password, tidak ada fitur captcha ataupun 2 factor authentication yang diimplementasikan. Form ini juga hanya khusus digunakan untuk login sehingga fitur lain seperti register perlu diimplementasikan di form yang berbeda. Terakhir, Django AuthenticationForm juga memiliki tampilan yang mendasar sehingga terlihat kurang menarik jika tidak dimodifikasi.
+
+## Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+Autentikasi adalah proses memastikan atau memverifikasi identitas pengguna yang sesuai, contohnya penggunaan login dengan username dan password yang sesuai. Sementara itu, otorisasi adalah proses memverifikasi hak akses pengguna yang sudah tervalidasi, contohnya pengguna biasa tidak bisa mengakses halaman admin karena dia bukan seorang admin. 
+
+Dalam Django sendiri, autentikasi dan otorisasi berjalan beriringan melalui sistem bawaan django.contrib.auth. Autentikasi digunakan untuk memastikan identitas pengguna, misalnya saat login dengan username dan password, lalu Django menyimpannya di session sehingga setiap request berikutnya bisa mengenali siapa pengguna melalui request.user. Setelah identitas jelas, barulah otorisasi bekerja untuk menentukan apa saja yang boleh dilakukan pengguna tersebut. Django menyediakan mekanisme izin (permissions) dan grup untuk mengatur hak akses, misalnya hanya admin yang boleh menghapus data atau hanya user tertentu yang bisa membuka halaman khusus. Penerapan otorisasi ini bisa dilakukan langsung di view dengan decorator seperti @login_required atau @permission_required. Dengan cara ini, Django tidak hanya memastikan siapa pengguna, tetapi juga membatasi tindakan mereka sesuai peran dan hak akses yang diberikan.
+
+## Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+Dalam sebuah aplikasi web, session dan cookies sama-sama dipakai untuk menyimpan state yaitu informasi agar server bisa mengingat pengguna. Meskipun demikian, keduanya memilki kelebihan dan kekurangan masing-masing.
+
+Session disimpan di server (contohnya di database, cache, atau file), sementara browser hanya menyimpan ID session dalam cookie. Kelebihannya, data lebih aman karena detailnya tidak ada di sisi client, kapasitas penyimpanan lebih besar, dan mudah dihapus atau dikontrol server. Kekurangannya, session membebani server karena butuh ruang simpan dan manajemen tambahan kalau tidak diatur dengan baik, bisa bikin server yang digunakan boros memori.
+
+Cookies disimpan langsung di browser pengguna. Kelebihannya, tidak membebani server, sederhana, dan bisa dipakai lintas request atau bahkan lintas kunjungan (selama cookie belum expired). Kekurangannya, kapasitas penyimpanan kecil (umumnya maksimal 4 KB per cookie), mudah dilihat atau dimanipulasi oleh client jika tidak dienkripsi dengan baik, serta rawan disalahgunakan untuk tracking.
+
+Kesimpulannya, session lebih aman dan cocok untuk data sensitif seperti login, sedangkan cookies lebih ringan dan praktis untuk preferensi pengguna seperti theme atau bahasa yang digunakan
+
+## Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+Secara default, penggunaan cookies dalam pengembangan web tidak sepenuhnya aman, karena ada beberapa risiko potensial yang harus diwaspadai. Misalnya, cookie bisa dicuri lewat session hijacking, dimanipulasi di sisi client, terekspos lewat XSS (Cross-Site Scripting), atau disalahgunakan dalam serangan CSRF (Cross-Site Request Forgery). Django menangani hal ini dengan sejumlah mekanisme keamanan bawaan. Secara standar, cookie session Django diberi atribut HttpOnly, sehingga tidak bisa diakses melalui JavaScript. Django juga menyediakan opsi SESSION_COOKIE_SECURE, agar cookie hanya dikirim melalui HTTPS, serta SESSION_COOKIE_SAMESITE untuk membatasi pengiriman cookie lintas situs. Terakhir, Django juga memiliki csrf token yang dapat diimplementasikan pada kode project kita sehingga cyber attack seperti CSRF dapat terhindarkan.
+
+## Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+1. Mengimport UserCreationForm dari  django.contrib.auth.forms dan messages dari django.contrib pada views.py yang digunakan untuk form register nanti
+2. Menambahkan fungsi register pada vies.py dan membuat form baru dengan UserCreationForm(). Lalu, memvalidasi form dengan form.is_valid() apabila request "POST" dan ngesave form tersebut dengan form.save(). Fungsi dirender dengan context form dan tampilan register.html.
+3. Membuat berkas register.html untuk tampilan registernya dengan csrf_token agar aman dari serangan (pada directory templates dalam main)
+4. Menghubungkan fungsi register tersebut pada urls.py dengan mengimport fungsinya dan membuat path baru 'register/' dengan nama register
+5. Mengimport AuthenticationForm, authenticate, dan login pada views.py untuk login pengguna
+6. Menambahkan fungsi login_user yang membuat form dengan AuthenticationForm dan memvalidasi form dengan form.is_valid() apabila request "POST". Lalu menambahkan login(request, user) untuk login user. Fungis dirender dengan context form dan tampilan login.html.
+7. Membuat berkas login.html pada directory templates dalam main untuk tampilan login
+8. Menghubungkan fungsi login tersebut pada urls.py dengan mengimport fungsi login_user dari views dan membuat path baru 'login/' dengan nama login
+9. Mengimport logout dari django.contrib.auth pada views.py
+10. Membuat fungsi logout pada views.py dengan logout(request) dan return redirect ke tampilan main
+11. Membuat button 'Logout' baru pada halaman main 
+12. Menghubungkan fungsi logout tersebut pada urls.py dengan mengimport fungsi logout dari views dan membuat path baru 'logout/' dengan nama logout
+13. Mengimport login_required dari django.contrib.auth.decorators dan menambahkan @login_required(login_url='/login') pada fungsi show_main dan create_product agar pengguna perlu autentikasi terlebih dahulu sebelum mengakses halaman tersebut
+14. Mengimport HttpResponseRedirect, reverse, dan datetime pada views.py
+15. Memodifikasi fungsi login_user pada bagian form.is_valid() dengan response = HttpResponseRedirect(reverse("main:show_main")) untuk balik ke tampilan utama dan juga response.set_cookie('last_login', str(datetime.datetime.now()) untuk cookie last login pengguna
+16. Menambahkan context baru pada fungsi show_main di views.py dengan 'last_login': request.COOKIES['last_login'] agar dapat ngeshow di tampilan main
+17. Memodifikasi fungsi logout pada views.py dengan menambahkan  response = HttpResponseRedirect(reverse('main:login')) dan response.delete_cookie('last_login') untuk redirect ke halaman login lagi jika logout dan ngedelete cookie last login yang ada
+18. Menambahkan header baru pada main.html yang menampilkan sesi terakhir login dengan {{last_login}}
+19. Mengimport User dari django.contrib.auth.models pada models.py
+20. Menambahkan field baru pada class Product yaitu user dengan models.ForeignKey(User, on_delete=models.CASCADE, null=True) untuk menghubungkan user dengan model product
+21. Melakukan migrasi dengan makemigrations dan migrate agar perubahan dapat tersimpan di database
+22. Memodifikasi fungsi create_product di views.py pada bagian if form.is_valid() dengan menambahkan product_entry = form.save(commit = False) agar productnya tidak langsung menyimpan objek hasil form ke database. Lalu,  menambahkan product_entry.user = request.user untuk user yang sedang login dan ngesave product_entry tersebut dengan .save().
+23. Memodifikasi fungsi show_main di views.py dengan membuat filter terlebih dahulu filter_type = request.GET.get("filter", "all"). Lalu menambahkan if conditionals (apabila filternya "all" maka akan menampilkan semua product dengan Product.objects.all() dan else maka akan menampilkan product si pengguna yang sedang login itu dengan Product.objects.filter(user=request.user)).
+24. Memodifikasi tampilan main.html dengan menambahkan button 'All products' dengan href = ?filter=all untuk menampilkan semua product dan juga buttonn 'My products' dengan href = ref="?filter=my" untuk menampilkan product user yang sedang login.
+25. Memodifikasi product_detail.html dengan menambahkan nama penjual dengan {{product.user.username}} apabila dibuat oleh user dan Anonymous apabila tidak dibuat oleh user (sebelum implementasi login).
+26. Memodifikasi main.html dengan menambahkan <p> Selamat datang, <b> {{ user.username }}</b>! </p> untuk informasi nama user yang sedang login
+27. Membuat 3 account baru yaitu test101, alfino101, dan alfino67 dan menambahkan 3 product baru pada masing masing account.
+28. Melakukan add commit dan push ke github dan juga PWS
+
+
 
 
 
