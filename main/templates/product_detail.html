@@ -12,6 +12,12 @@
 <br /><br />
 {% endif %}
 
+{% if product.user %}
+    <p>Penjual: {{ product.user.username }}</p>
+{% else %}
+    <p>Penjual: Anonymous</p>
+{% endif %}
+
   <p>
     <b>Brand:</b> {{ product.brand }}<br>
     <b>Price:</b> {{ product.price }}<br>
