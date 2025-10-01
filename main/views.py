@@ -116,6 +116,54 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
+def edit_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_product.html", context)
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
+
+def product_list_by_category(request, category=None):
+    products = Product.objects.all()
+
+    if category == "apparels":
+        products = products.filter(category__in=["Shirts", "Hoodies", "Socks", "Shorts"])
+    elif category == "shoes":
+        products = products.filter(category="Shoes")
+    elif category == "others":
+        products = products.filter(category="Ball")
+
+    # apply extra filter
+    filter_type = request.GET.get("filter")
+    if filter_type == "my" and request.user.is_authenticated:
+        products = products.filter(user=request.user)
+
+    context = {
+        'npm' : '2406405304',
+        'name': 'Alfino Ahmad Feriza',
+        'class': 'PBP C',
+        "products": products,
+        "category": category,
+        "last_login": request.COOKIES.get('last_login', 'Never')
+    }
+
+    return render(request, "product_list.html", context)
+
+
+
+
+
  
 
 

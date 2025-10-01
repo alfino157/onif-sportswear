@@ -1,29 +1,82 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>{{ product.title }} - Football Product</title>
+{% endblock meta %}
+
 {% block content %}
-<p><a href="{% url 'main:show_main' %}"><button>← Back to our products</button></a></p>
+<div class="bg-gray-50 w-full min-h-screen py-10">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Back Navigation -->
+    <div class="mb-6">
+      <a href="{% url 'main:show_main' %}" class="text-gray-600 hover:text-gray-900 font-medium transition">
+        ← Back to Products
+      </a>
+    </div>
+    
+    <!-- Product Card -->
+    <article class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+      
+      <!-- Header: Category badge -->
+      <div class="p-6 sm:p-8 pb-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-800 tracking-wide">
+            {{ product.get_category_display|upper }}
+          </span>
+        </div>
+      </div>
 
-<h1>{{ product.name }}</h1>
-<p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
-    <b>Featured</b>{% endif %}
-</p>
+      <!-- Product Image -->
+      {% if product.thumbnail %}
+        <div class="px-6 sm:px-8">
+          <div class="overflow-hidden rounded-lg">
+            <img src="{{ product.thumbnail }}" 
+                 alt="{{ product.title }}" 
+                 class="w-full h-72 sm:h-96 object-cover transform transition duration-700 hover:scale-105">
+          </div>
+        </div>
+      {% endif %}
 
-{% if product.thumbnail %}
-<img src="{{ product.thumbnail }}" alt="Product thumbnail" width="300">
-<br /><br />
-{% endif %}
+      <!-- Content (Order: Name, Brand, Price, Stock, Description) -->
+      <div class="p-6 sm:p-8 space-y-4">
+        <!-- Nama -->
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+          {{ product.name }}
+        </h1>
 
-{% if product.user %}
-    <p>Penjual: {{ product.user.username }}</p>
-{% else %}
-    <p>Penjual: Anonymous</p>
-{% endif %}
+        <!-- Brand (tampilkan jika ada) -->
+        {% if product.brand %}
+          <div>
+            <h2 class="text-sm font-semibold text-gray-600 mb-1">Brand</h2>
+            <p class="text-gray-900 font-medium">{{ product.brand }}</p>
+          </div>
+        {% endif %}
 
-  <p>
-    <b>Brand:</b> {{ product.brand }}<br>
-    <b>Price:</b> {{ product.price }}<br>
-    <b>Stock:</b> {{ product.stock }}
-  </p>
+        <!-- Harga -->
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Price</h2>
+          <p class="text-gray-600 font-bold">Rp. {{ product.price }}</p>
+        </div>
 
-<p>{{ product.description }}</p>
+        <!-- <! -- Stock -->
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Stock</h2>
+          <p class="text-gray-600 font-bold">{{ product.stock }}</p>
+        </div>
 
+
+
+        <!-- Description (jarak judul-ke-isi diperkecil) -->
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Description</h2>
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+            {{ product.description }}
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
 {% endblock content %}
