@@ -241,6 +241,36 @@ Dengan demikian, dalam penggunannya, flexbox lebih tepat dimanfaatkan untuk meny
 28. Melakukan add, commit, dan push pada github dan PWS.
 
 
+# Tugas 5
+
+## Apa perbedaan antara synchronous request dan asynchronous request?
+Synchronous berarti prosesnya berjalan secara berurutan dan harus ditunggu. Saat sebuah aksi dilakukan, misalnya sebuah tombol diklik, browser akan mengirim permintaan ke server. Selama permintaan diproses, seluruh halaman menjadi tidak responsif atau freeze. Tidak ada interaksi lain yang dapat dilakukan hingga server selesai memproses dan mengirim kembali satu halaman penuh yang baru.
+
+Sedangkan Asynchronous (AJAX), prosesnya tidak saling menunggu. Ketika sebuah aksi dilakukan, permintaan akan dikirim ke server di latar belakang. Sambil menunggu respons dari server, halaman web tetap bisa di-scroll, formulir tetap bisa diisi, atau interaksi lainnya dapat terus dilakukan. Begitu server selesai merespons, hanya bagian tertentu dari halaman saja yang akan diperbarui dengan data baru, tanpa perlu ada proses muat ulang keseluruhan.
+
+## Bagaimana AJAX bekerja di Django (alur request–response)?
+
+Pemicu di Browser: Sebuah event (misalnya, klik tombol atau input data) memicu fungsi JavaScript.
+Pengiriman Request: JavaScript, melalui fetch API atau XHR, mengirimkan request ke URL spesifik di server Django tanpa me-reload halaman. Untuk request POST, header X-CSRFToken harus disertakan untuk keamanan.
+Routing di Django: urls.py menerima request dan meneruskannya ke view yang sesuai.
+Proses di View: View memproses data yang diterima, berinteraksi dengan database jika perlu, dan menyiapkan response, biasanya dalam format JSON.
+Pembaruan Halaman: Response dikirim kembali ke browser. JavaScript kemudian menerima data JSON ini dan secara dinamis mengubah konten HTML (DOM) pada halaman, seperti mengisi tabel atau menampilkan notifikasi tanpa perlu memuat ulang seluruh halaman.
+
+## Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+Responsivitas Tinggi: Aplikasi terasa lebih cepat karena hanya bagian kecil dari halaman yang diperbarui, bukan seluruhnya. Ini menghilangkan jeda yang disebabkan oleh full page reload.
+Pengalaman Pengguna yang Lancar: Pengguna dapat terus berinteraksi dengan halaman web bahkan saat server sedang memproses permintaan di latar belakang, sangat ideal untuk fitur real-time seperti chat atau notifikasi.
+Pemisahan Frontend dan Backend: AJAX mendorong pemisahan tugas yang jelas. Tim backend (Django) fokus pada penyediaan data melalui API, sementara tim frontend (JavaScript) fokus pada tampilan dan interaksi pengguna, sehingga mempermudah kolaborasi.
+
+## Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+Proteksi CSRF (Cross-Site Request Forgery): Pastikan {% csrf_token %} ada di template dan JavaScript mengirimkan token tersebut dalam header X-CSRFToken pada setiap request POST. Ini mencegah pihak luar memalsukan permintaan atas nama pengguna.
+Otentikasi dan Otorisasi: Gunakan decorator seperti @login_required untuk melindungi view yang hanya boleh diakses oleh pengguna yang sudah login. Selain itu, selalu verifikasi kepemilikan data (misalnya, produk.user == request.user) untuk memastikan pengguna tidak mengubah data milik orang lain.
+Validasi di Sisi Server: Selalu gunakan Django Forms untuk memvalidasi semua data yang masuk dari request. Gunakan form.is_valid() untuk memastikan tipe dan format data sudah benar sebelum disimpan.
+Respons Error yang Minimal: Jika terjadi kegagalan login, kirim JsonResponse dengan pesan yang umum (contoh: "Kredensial tidak valid") dan jangan memberikan detail spesifik tentang kesalahan (seperti "Password salah") yang bisa dieksploitasi.
+
+## Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?
+AJAX secara signifikan meningkatkan User Experience (UX) dengan membuat website terasa lebih dinamis dan interaktif. Karena tidak ada proses muat ulang halaman penuh, interaksi seperti memfilter produk, mencari data, atau validasi formulir terjadi secara instan dan mulus. Fitur seperti notifikasi atau pembaruan data real-time juga dapat diimplementasikan dengan mudah. Ini memberikan pengalaman pengguna yang lebih lancar dan modern. Namun, jika tidak diimplementasikan dengan baik, perubahan konten yang tiba-tiba dapat membingungkan pengguna. Oleh karena itu, penting untuk memberikan umpan balik visual yang jelas, seperti ikon loading, untuk menandakan bahwa sebuah proses sedang berjalan di latar belakang.
+
+
 
 
 
