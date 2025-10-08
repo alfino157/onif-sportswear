@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from main.forms import ProductForm
 from main.models import Product
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core import serializers
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
+import json
 import datetime
-
 
 # Create your views here.
 
@@ -35,18 +38,37 @@ def show_main(request):
     return render(request, "main.html", context)
 
 @login_required(login_url="/login")
+@csrf_exempt
 def create_product(request):
-    form = ProductForm(request.POST or None)
+    if request.method == "GET":
+        return render(request, "create_product.html")
 
-    if form.is_valid() and request.method == "POST":
-        # form.save()
-        product_entry = form.save(commit = False)
-        product_entry.user = request.user
-        product_entry.save()
-        return redirect('main:show_main')
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            product = Product.objects.create(
+                user=request.user,
+                name=data.get("name"),
+                brand=data.get("brand"),
+                description=data.get("description"),
+                category=data.get("category"),
+                thumbnail=data.get("thumbnail"),
+                price=data.get("price") or 0,
+                stock=data.get("stock") or 0,
+                is_featured=data.get("is_featured", False),
+            )
+            return JsonResponse({
+                "success": True,
+                "message": "Product created successfully",
+                "id": str(product.id),
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": str(e),
+            }, status=400)
 
-    context = {'form': form}
-    return render(request, "create_product.html", context)
+    return JsonResponse({"success": False, "message": "Invalid request"}, status=405)
 
 def show_product(request, id):
     product = get_object_or_404(Product, pk=id)
@@ -63,8 +85,24 @@ def show_xml(request):
 
 def show_json(request):
     product_list = Product.objects.all()
-    json_data = serializers.serialize("json", product_list)
-    return HttpResponse(json_data, content_type="application/json")
+    data = [
+        {
+            'id': str(product.id),
+            'name': product.name,
+            'brand': product.brand,
+            'description': product.description,
+            'category': product.category,
+            'category_display': product.get_category_display(), 
+            'thumbnail': product.thumbnail,
+            'price': product.price,
+            'stock' : product.stock,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+        }
+        for product in product_list
+    ]
+
+    return JsonResponse(data, safe=False)
 
 def show_xml_by_id(request, product_id):
    try:
@@ -75,40 +113,84 @@ def show_xml_by_id(request, product_id):
        return HttpResponse(status=404)
 
 def show_json_by_id(request, product_id):
-   try:
-    product_item = Product.objects.get(pk=product_id)
-    json_data = serializers.serialize("json", [product_item])
-    return HttpResponse(json_data, content_type="application/json")
-   except Product.DoesNotExist:
-       return HttpResponse(status=404)
+    try:
+        product = Product.objects.select_related('user').get(pk=product_id)
+        data = {
+            'id': str(product.id),
+            'name': product.name,
+            'brand': product.brand,
+            'description': product.description,
+            'category': product.category,
+            'category_display': product.get_category_display(), 
+            'thumbnail': product.thumbnail,
+            'price': product.price,
+            'stock' : product.stock,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+            'user_username': product.user.username if product.user_id else None,
+        }
+        return JsonResponse(data)
+    except Product.DoesNotExist:
+        return JsonResponse({'detail': 'Not found'}, status=404)
 
+@csrf_exempt
 def register(request):
-    form = UserCreationForm()
+    if request.method == "GET":
+        return render(request, "register.html")
 
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
+    elif request.method == "POST":
+        # Wajib JSON (AJAX)
+        if request.headers.get("Content-Type") != "application/json":
+            return JsonResponse({"success": False, "message": "AJAX only"}, status=400)
+
+        import json
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Invalid JSON: {e}"}, status=400)
+
+        form = UserCreationForm(data={
+            "username": data.get("username", ""),
+            "password1": data.get("password1", ""),
+            "password2": data.get("password2", ""),
+        })
+
         if form.is_valid():
             form.save()
-            messages.success(request, 'Your account has been successfully created!')
-            return redirect('main:login')
-    context = {'form':form}
-    return render(request, 'register.html', context)
+            return JsonResponse({"success": True, "message": "Account created"})
 
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors
+        }, status=400)
+
+    return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+@csrf_exempt
 def login_user(request):
-   if request.method == 'POST':
-      form = AuthenticationForm(data=request.POST)
+    if request.method == 'GET':
+        return render(request, 'login.html')
 
-      if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            response = HttpResponseRedirect(reverse("main:show_main"))
-            response.set_cookie('last_login', str(datetime.datetime.now()))
-            return response
+    elif request.method == 'POST':
+        # Jika dari AJAX (JSON)
+        if request.headers.get('Content-Type') == 'application/json':
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+                username = data.get('username')
+                password = data.get('password')
 
-   else:
-      form = AuthenticationForm(request)
-   context = {'form': form}
-   return render(request, 'login.html', context)
+                user = authenticate(request, username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    response = JsonResponse({"success": True, "message": "Login successful"})
+                    response.set_cookie('last_login', str(datetime.datetime.now()))
+                    return response
+                else:
+                    return JsonResponse({"success": False, "message": "Invalid username or password"}, status=401)
+            except Exception as e:
+                return JsonResponse({"success": False, "message": str(e)}, status=400)
+            
+    return JsonResponse({"success": False, "message": "Invalid request"}, status=405)
 
 def logout_user(request):
     logout(request)
@@ -116,18 +198,43 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
+@csrf_exempt
 def edit_product(request, id):
-    product = get_object_or_404(Product, pk=id)
-    form = ProductForm(request.POST or None, instance=product)
-    if form.is_valid() and request.method == 'POST':
-        form.save()
-        return redirect('main:show_main')
+    product = get_object_or_404(Product, pk=id, user=request.user)
 
-    context = {
-        'form': form
-    }
+    if request.method == "GET":
+        # render halaman edit product dengan data awal
+        return render(request, "edit_product.html", {"product": product})
 
-    return render(request, "edit_product.html", context)
+    elif request.method == "POST":
+        if request.headers.get("Content-Type") != "application/json":
+            return JsonResponse({"success": False, "message": "AJAX only"}, status=400)
+
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+
+            product.name = strip_tags(data.get("name", product.name))
+            product.brand = data.get("brand", product.brand)
+            product.description = strip_tags(data.get("description", product.description))
+            product.category = data.get("category", product.category)
+            product.thumbnail = data.get("thumbnail", product.thumbnail)
+            product.price = data.get("price") or 0
+            product.stock = data.get("stock") or 0
+            product.is_featured = data.get("is_featured", False)
+            product.save()
+
+            return JsonResponse({
+                "success": True,
+                "message": "Product updated successfully",
+                "id": str(product.id),
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": str(e),
+            }, status=400)
+
+    return JsonResponse({"success": False, "message": "Invalid request"}, status=405)
 
 def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)
@@ -144,7 +251,7 @@ def product_list_by_category(request, category=None):
     elif category == "others":
         products = products.filter(category="Ball")
 
-    # apply extra filter
+    # extra filter
     filter_type = request.GET.get("filter")
     if filter_type == "my" and request.user.is_authenticated:
         products = products.filter(user=request.user)
@@ -159,6 +266,67 @@ def product_list_by_category(request, category=None):
     }
 
     return render(request, "product_list.html", context)
+
+@csrf_exempt
+@require_POST
+def add_product_ajax(request):
+    """
+    Handle AJAX form submission to create a new Product.
+    Works with both form-data and JSON-based requests.
+    """
+    try:
+        if request.content_type == 'application/json':
+            import json
+            data = json.loads(request.body.decode('utf-8'))
+        else:
+            data = request.POST
+
+        raw_name = data.get("name")
+        brand = data.get("brand")
+        raw_description = data.get("description")
+        category = data.get("category")
+        thumbnail = data.get("thumbnail")
+        price = data.get("price") or 0
+        stock = data.get("stock") or 0
+        is_featured = (
+            str(data.get("is_featured")).lower() in ["true", "on", "1"]
+        )
+        user = request.user if request.user.is_authenticated else None
+
+        name = strip_tags(raw_name)
+        description = strip_tags(raw_description)
+
+        # Basic validation
+        if not name or not category:
+            return JsonResponse({
+                "success": False,
+                "message": "Product name and category are required."
+            }, status=400)
+
+        # Save product
+        new_product = Product.objects.create(
+            user=user,
+            name=name,
+            brand=brand,
+            description=description,
+            category=category,
+            thumbnail=thumbnail,
+            price=price,
+            stock=stock,
+            is_featured=is_featured,
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "Product created successfully.",
+            "id": str(new_product.id),
+        }, status=201)
+
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "message": f"Error: {str(e)}"
+        }, status=500)
 
 
 

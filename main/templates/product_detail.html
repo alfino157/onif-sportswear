@@ -2,81 +2,154 @@
 {% load static %}
 
 {% block meta %}
-<title>{{ product.title }} - Football Product</title>
+<title>Football Product Detail</title>
 {% endblock meta %}
 
 {% block content %}
 <div class="bg-gray-50 w-full min-h-screen py-10">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-    
+
     <!-- Back Navigation -->
     <div class="mb-6">
       <a href="{% url 'main:show_main' %}" class="text-gray-600 hover:text-gray-900 font-medium transition">
         ← Back to Products
       </a>
     </div>
-    
-    <!-- Product Card -->
-    <article class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+
+    <!-- Loading -->
+    <div id="loading-state" class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-gray-600 mt-3">Loading product detail...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-state" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <div class="w-16 h-16 mx-auto mb-4">
+        <div class="text-red-500 text-5xl">⚠️</div>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Failed to load product</h3>
+      <p class="text-gray-500">Please try again later.</p>
+    </div>
+
+    <!-- Product Content -->
+    <article id="product-content" class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hidden">
       
       <!-- Header: Category badge -->
       <div class="p-6 sm:p-8 pb-4">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-800 tracking-wide">
-            {{ product.get_category_display|upper }}
-          </span>
+          <span id="product-category" class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-800 tracking-wide"></span>
         </div>
       </div>
 
       <!-- Product Image -->
-      {% if product.thumbnail %}
-        <div class="px-6 sm:px-8">
-          <div class="overflow-hidden rounded-lg">
-            <img src="{{ product.thumbnail }}" 
-                 alt="{{ product.title }}" 
-                 class="w-full h-72 sm:h-96 object-cover transform transition duration-700 hover:scale-105">
-          </div>
-        </div>
-      {% endif %}
-
-      <!-- Content (Order: Name, Brand, Price, Stock, Description) -->
-      <div class="p-6 sm:p-8 space-y-4">
-        <!-- Nama -->
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-          {{ product.name }}
-        </h1>
-
-        <!-- Brand (tampilkan jika ada) -->
-        {% if product.brand %}
-          <div>
-            <h2 class="text-sm font-semibold text-gray-600 mb-1">Brand</h2>
-            <p class="text-gray-900 font-medium">{{ product.brand }}</p>
-          </div>
-        {% endif %}
-
-        <!-- Harga -->
-        <div>
-          <h2 class="text-sm font-semibold text-gray-600 mb-1">Price</h2>
-          <p class="text-gray-600 font-bold">Rp. {{ product.price }}</p>
-        </div>
-
-        <!-- <! -- Stock -->
-        <div>
-          <h2 class="text-sm font-semibold text-gray-600 mb-1">Stock</h2>
-          <p class="text-gray-600 font-bold">{{ product.stock }}</p>
-        </div>
-
-
-
-        <!-- Description (jarak judul-ke-isi diperkecil) -->
-        <div>
-          <h2 class="text-sm font-semibold text-gray-600 mb-1">Description</h2>
-          <p class="text-gray-700 leading-relaxed whitespace-pre-line">
-            {{ product.description }}
-          </p>
+      <div id="product-image-container" class="px-6 sm:px-8 hidden">
+        <div class="overflow-hidden rounded-lg">
+          <img id="product-image" src="" alt="" class="w-full h-72 sm:h-96 object-cover transform transition duration-700 hover:scale-105">
         </div>
       </div>
+
+      <!-- Content -->
+      <div class="p-6 sm:p-8 space-y-4">
+        <h1 id="product-name" class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight"></h1>
+
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Brand</h2>
+          <p id="product-brand" class="text-gray-900 font-medium"></p>
+        </div>
+
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Price</h2>
+          <p id="product-price" class="text-gray-600 font-bold"></p>
+        </div>
+
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Stock</h2>
+          <p id="product-stock" class="text-gray-600 font-bold"></p>
+        </div>
+
+        <div>
+          <h2 class="text-sm font-semibold text-gray-600 mb-1">Description</h2>
+          <p id="product-description" class="text-gray-700 leading-relaxed whitespace-pre-line"></p>
+        </div>
+      </div>
+
+      <!-- Footer (Author info) -->
+      <div class="border-t border-gray-200 p-6 sm:p-8 bg-gray-50">
+        <p id="product-author" class="text-sm text-gray-500">Author: Loading...</p>
+      </div>
     </article>
+
   </div>
 </div>
+
+<script>
+// Configuration
+const PRODUCT_ID = "{{ product.id }}";
+const PRODUCT_DETAIL_ENDPOINT = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', PRODUCT_ID);
+
+// DOM Elements
+const loadingState = document.getElementById('loading-state');
+const errorState = document.getElementById('error-state');
+const productContent = document.getElementById('product-content');
+const categoryLabel = document.getElementById('product-category');
+const imageContainer = document.getElementById('product-image-container');
+const imageEl = document.getElementById('product-image');
+const nameEl = document.getElementById('product-name');
+const brandEl = document.getElementById('product-brand');
+const priceEl = document.getElementById('product-price');
+const stockEl = document.getElementById('product-stock');
+const descEl = document.getElementById('product-description');
+const authorEl = document.getElementById('product-author');
+
+function showState(state) {
+  loadingState.classList.toggle('hidden', state !== 'loading');
+  errorState.classList.toggle('hidden', state !== 'error');
+  productContent.classList.toggle('hidden', state !== 'ready');
+}
+
+// Render product detail
+function renderProduct(p) {
+  document.title = `${p.name} - Football Product`;
+
+  // Category
+  categoryLabel.textContent = (p.category_display || p.category || 'Unknown').toUpperCase();
+
+  // Image
+  if (p.thumbnail) {
+    imageEl.src = p.thumbnail;
+    imageEl.alt = p.name;
+    imageContainer.classList.remove('hidden');
+  } else {
+    imageContainer.classList.add('hidden');
+  }
+
+  // Text content
+  nameEl.textContent = p.name;
+  brandEl.textContent = p.brand || '-';
+  priceEl.textContent = `Rp ${Number(p.price).toLocaleString()}`;
+  stockEl.textContent = `${p.stock} in stock`;
+  descEl.textContent = p.description || 'No description available';
+  authorEl.textContent = `Author: ${p.user_username || 'Anonymous'}`;
+}
+
+// Fetch product detail
+async function loadProductDetail() {
+  try {
+    showState('loading');
+    const res = await fetch(PRODUCT_DETAIL_ENDPOINT, { headers: { 'Accept': 'application/json' }});
+    if (!res.ok) throw new Error('Failed to fetch product detail');
+    const data = await res.json();
+    renderProduct(data);
+    showState('ready');
+  } catch (err) {
+    console.error(err);
+    showState('error');
+  }
+}
+
+loadProductDetail();
+</script>
 {% endblock content %}

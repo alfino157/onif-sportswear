@@ -10,48 +10,264 @@
 <div class="bg-gray-50 w-full pt-16 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2"> Football Products</h1>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Football Products</h1>
       <p class="text-gray-600">Browse the latest products from our store</p>
     </div>
 
-    <!-- Filter Section -->
+    <!-- Create Product Button -->
+    <div class="flex justify-end mb-6">
+      <button onclick="showModal()" 
+        class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white font-medium rounded-md 
+              shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Create Product
+      </button>
+
+      <button id="editProductButton" onclick="showEditModal()"
+        class="hidden ml-3 inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 font-medium rounded-md 
+              shadow-sm border border-blue-600 hover:bg-blue-600 hover:text-white focus:outline-none 
+              focus:ring-2 focus:ring-blue-500 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213l-4.5 1.5 1.5-4.5L16.862 4.487z" />
+        </svg>
+        Edit Product
+      </button>
+  </div>
+
+    <!-- Filter -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4">
       <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?" class="{% if request.GET.filter == 'all' or not request.GET.filter  %} bg-purple-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800 hover:text-white">
+        <a id="filter-all" class="bg-purple-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800">
           All Product
         </a>
-        <a href="?filter=my" class="{% if request.GET.filter == 'my' %} bg-purple-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800 hover:text-white">
+        <a id="filter-my" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800 hover:text-white">
           My Product
         </a>
       </div>
       {% if user.is_authenticated %}
-        <div class="text-sm text-gray-500">
-          Last login: {{ last_login }}
-        </div>
+        <div class="text-sm text-gray-500">Last login: {{ last_login }}</div>
       {% endif %}
     </div>
 
-    <!-- product Grid -->
-    {% if not product_list %}
-      <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <div class="w-32 h-32 mx-auto mb-4">
-          <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain">
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No product found</h3>
-        <p class="text-gray-500 mb-6">Be the first to create a new football product for the community.</p>
-        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-          Create product
-        </a>
+    <!-- Loading -->
+    <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <svg class="animate-spin h-8 w-8 text-purple-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-gray-600 mt-3">Loading products...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden text-center text-red-600 font-medium"></div>
+
+    <!-- Product Grid -->
+    <div id="grid" class="hidden"></div>
+
+    <!-- Empty -->
+    <div id="empty" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <div class="w-32 h-32 mx-auto mb-4">
+        <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain">
       </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for product in product_list %}
-          {% include 'card_product.html' with product=product %}
-        {% endfor %}
-      </div>
-    {% endif %}
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No product found</h3>
+      <p class="text-gray-500 mb-6">Be the first to create a new football product for the community.</p>
+      <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-800 transition-colors">
+        Create product
+      </a>
+    </div>
   </div>
 </div>
+
+<script>
+const PRODUCT_API_ENDPOINT = "{% url 'main:show_json' %}";
+const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
+
+const loading = document.getElementById('loading');
+const errorBox = document.getElementById('error');
+const emptyBox = document.getElementById('empty');
+const grid = document.getElementById('grid');
+const btnAll = document.getElementById('filter-all');
+const btnMy = document.getElementById('filter-my');
+
+let products = [];
+let activeFilter = 'all';
+
+function showSection({ loadingState=false, errorState=false, emptyState=false, gridState=false }) {
+  loading.classList.toggle('hidden', !loadingState);
+  errorBox.classList.toggle('hidden', !errorState);
+  emptyBox.classList.toggle('hidden', !emptyState);
+  grid.classList.toggle('hidden', !gridState);
+  if (gridState) grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+}
+
+function updateFilterButtons() {
+  if (activeFilter === 'all') {
+    btnAll.className = 'bg-purple-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800';
+    btnMy.className = 'bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800 hover:text-white';
+  } else {
+    btnMy.className = 'bg-purple-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800';
+    btnAll.className = 'bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-purple-800 hover:text-white';
+  }
+}
+
+function createCard(p) {
+  // elemen artikel utama
+  const article = document.createElement("article");
+  article.className =
+    "bg-white rounded-xl border border-gray-200 overflow-hidden group transform transition duration-300 hover:-translate-y-1 hover:shadow-xl w-full";
+
+  // buat URL dinamis (detail, edit, delete)
+  const linkDetail = `{% url 'main:show_product' '00000000-0000-0000-0000-000000000000' %}`.replace(
+    "00000000-0000-0000-0000-000000000000",
+    p.id
+  );
+  const linkEdit = `{% url 'main:edit_product' '00000000-0000-0000-0000-000000000000' %}`.replace(
+    "00000000-0000-0000-0000-000000000000",
+    p.id
+  );
+  
+  const linkDelete = `{% url 'main:delete_product' '00000000-0000-0000-0000-000000000000' %}`.replace(
+    "00000000-0000-0000-0000-000000000000",
+    p.id
+  );
+
+  // 🔒 sanitasi semua input dari server
+  const name = DOMPurify.sanitize(p.name || "");
+  const brand = DOMPurify.sanitize(p.brand || "");
+  const description = DOMPurify.sanitize(p.description || "");
+  const category = DOMPurify.sanitize(p.category_display || p.category || "");
+  const thumbnail = DOMPurify.sanitize(p.thumbnail || "");
+  const price = DOMPurify.sanitize(p.price?.toString() || "0");
+  const stock = DOMPurify.sanitize(p.stock?.toString() || "0");
+  const isFeatured = p.is_featured;
+
+  // thumbnail
+  const thumbnailHTML = thumbnail
+    ? `<img src="${thumbnail}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">`
+    : `<div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">No Image</div>`;
+
+  // label kategori & featured
+  const categoryBadge = `<span class="inline-block px-3 py-1 rounded-md text-[11px] font-semibold bg-black/80 text-white uppercase tracking-wide">${category}</span>`;
+  const featuredBadge = isFeatured
+    ? `<span class="inline-block ml-2 px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">Featured</span>`
+    : "";
+
+  // tombol edit & delete jika milik user
+  const editDeleteButtons =
+    CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(p.user_id)
+      ? `
+        <button 
+          data-id="${p.id}"
+          onclick="handleEditClick(event)"
+          class="inline-flex items-center justify-center px-3.5 md:px-4 py-2 rounded-md 
+                text-xs md:text-sm font-medium border border-blue-600 text-blue-600 
+                transition hover:bg-blue-600 hover:text-white">
+          Edit
+        </button>
+        <a href="${linkDelete}" 
+          class="inline-flex items-center justify-center px-3.5 md:px-4 py-2 rounded-md 
+                text-xs md:text-sm font-medium border border-red-500 text-red-600 
+                transition hover:bg-red-600 hover:text-white"
+          onclick="return confirm('Delete this product?')">
+          Delete
+        </a>
+      `
+      : "";
+
+
+  // rakit html kartu
+  const cardHTML = `
+    <div class="aspect-[4/5] relative overflow-hidden">
+      ${thumbnailHTML}
+      <div class="absolute top-3 left-3">${categoryBadge}</div>
+      <div class="absolute top-3 right-3">${featuredBadge}</div>
+    </div>
+
+    <div class="p-5">
+      <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-1 leading-snug line-clamp-2">
+        <a href="${linkDetail}" class="hover:text-purple-600 transition-colors">${name}</a>
+      </h3>
+      <p class="text-gray-800 text-sm md:text-base font-semibold mb-1">Rp ${price}</p>
+      <p class="text-gray-500 text-sm mb-3">${brand}</p>
+      <p class="text-gray-700 text-sm mb-4 line-clamp-2">${description}</p>
+      <div class="text-gray-800 text-sm md:text-base mb-4">${stock} in stock</div>
+      <div class="pt-4 border-t border-gray-100 flex items-center gap-2">
+        <a href="${linkDetail}" class="inline-flex items-center justify-center px-4 py-2 rounded-md text-xs md:text-sm font-semibold border border-purple-600 text-purple-600 transition hover:bg-purple-600 hover:text-white">
+          View Product
+        </a>
+        ${editDeleteButtons}
+      </div>
+    </div>
+  `;
+
+  // sanitasi hasil html sebelum dipasang
+  article.innerHTML = DOMPurify.sanitize(cardHTML, {
+    ALLOWED_TAGS: [
+      "div",
+      "span",
+      "img",
+      "a",
+      "p",
+      "h3",
+      "button",
+      "strong",
+      "br"
+    ],
+    ALLOWED_ATTR: ["href", "src", "alt", "class", "onclick"]
+  });
+
+  return article;
+}
+
+
+function renderGrid(data) {
+  grid.innerHTML = '';
+  data.forEach(p => grid.appendChild(createCard(p)));
+}
+
+function applyFilter() {
+  updateFilterButtons();
+  const filtered = activeFilter === 'all'
+    ? products
+    : products.filter(p => Number(p.user_id) === Number(CURRENT_USER_ID));
+  if (filtered.length === 0) showSection({ emptyState: true });
+  else { renderGrid(filtered); showSection({ gridState: true }); }
+}
+
+async function fetchProducts() {
+  try {
+    showSection({ loadingState: true });
+    const res = await fetch(PRODUCT_API_ENDPOINT);
+    if (!res.ok) throw new Error('Failed to fetch data');
+    products = await res.json();
+    applyFilter();
+  } catch (err) {
+    console.error(err);
+    errorBox.textContent = 'Error loading products. Please try again.';
+    showSection({ errorState: true });
+  }
+}
+
+btnAll.addEventListener('click', () => { activeFilter = 'all'; applyFilter(); });
+btnMy.addEventListener('click', () => { activeFilter = 'my'; applyFilter(); });
+
+fetchProducts();
+
+document.addEventListener('productAdded', function() {
+    fetchProducts();
+});
+
+function handleEditClick(event) {
+  const id = event.currentTarget.dataset.id;
+  const product = products.find(p => p.id === id);
+  if (!product) return console.error("Product not found:", id);
+
+  showEditModal(product); // ini nanti akan buka modal edit dengan data produk
+}
+</script>
+
 {% endblock content %}
