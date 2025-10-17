@@ -26,7 +26,7 @@ def show_main(request):
         product_list = Product.objects.all()
     else:
         product_list = Product.objects.filter(user=request.user)
-        
+
     context = {
         'npm' : '2406405304',
         'name': 'Alfino Ahmad Feriza',
@@ -85,6 +85,7 @@ def show_xml(request):
 
 def show_json(request):
     product_list = Product.objects.all()
+    
     data = [
         {
             'id': str(product.id),
@@ -139,11 +140,9 @@ def register(request):
         return render(request, "register.html")
 
     elif request.method == "POST":
-        # Wajib JSON (AJAX)
         if request.headers.get("Content-Type") != "application/json":
             return JsonResponse({"success": False, "message": "AJAX only"}, status=400)
 
-        import json
         try:
             data = json.loads(request.body.decode("utf-8"))
         except Exception as e:
@@ -172,7 +171,6 @@ def login_user(request):
         return render(request, 'login.html')
 
     elif request.method == 'POST':
-        # Jika dari AJAX (JSON)
         if request.headers.get('Content-Type') == 'application/json':
             try:
                 data = json.loads(request.body.decode('utf-8'))
@@ -327,6 +325,8 @@ def add_product_ajax(request):
             "success": False,
             "message": f"Error: {str(e)}"
         }, status=500)
+    
+
 
 
 

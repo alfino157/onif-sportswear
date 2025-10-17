@@ -174,8 +174,8 @@
 </div>
 
 <script>
-    let isEditing = false;
-    let editingId = null;
+let isEditing = false;
+let editingId = null;
 
 function showModal() {
   isEditing = false;
@@ -196,9 +196,56 @@ function showModal() {
   }, 50);
 }
 
-async function addProductEntry() {
-  const form = document.querySelector('#productForm');
+function hideModal() {
+  const modal = document.getElementById('crudModal');
+  const modalContent = document.getElementById('crudModalContent');
 
+  modalContent.classList.remove('opacity-100', 'scale-100');
+  modalContent.classList.add('opacity-0', 'scale-95');
+
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
+}
+
+// Tutup modal saat klik di luar area putih
+document.getElementById('crudModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) hideModal();
+});
+
+function showEditModal(product) {
+  isEditing = true;
+  editingId = product.id;
+
+  const modal = document.getElementById('crudModal');
+  const modalContent = document.getElementById('crudModalContent');
+  const form = document.getElementById('productForm');
+
+  // Isi form dengan data produk yang mau diedit
+  form.name.value = product.name || "";
+  form.brand.value = product.brand || "";
+  form.description.value = product.description || "";
+  form.category.value = product.category || "";
+  form.thumbnail.value = product.thumbnail || "";
+  form.price.value = product.price ?? 0;
+  form.stock.value = product.stock ?? 0;
+  form.is_featured.checked = !!product.is_featured;
+
+  modal.querySelector("h3").textContent = "Edit Product";
+  document.getElementById("submitProduct").textContent = "Save Changes";
+
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modalContent.classList.remove('opacity-0', 'scale-95');
+    modalContent.classList.add('opacity-100', 'scale-100');
+  }, 50);
+}
+
+// Handle submit form (CREATE or EDIT)
+document.getElementById("productForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const form = e.currentTarget;
   const payload = {
     name: form.querySelector('#name').value,
     brand: form.querySelector('#brand').value,
@@ -212,10 +259,14 @@ async function addProductEntry() {
 
   try {
     const url = isEditing
-      ? `/edit-product/${editingId}/`
-      : "{% url 'main:create_product' %}";
+    ? `{% url 'main:edit_product' '00000000-0000-0000-0000-000000000000' %}`.replace(
+        "00000000-0000-0000-0000-000000000000",
+        editingId
+      )
+    : "{% url 'main:create_product' %}";
+
     const response = await fetch(url, {
-      method: "POST", // tetap pakai POST biar cocok dengan view kamu
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -232,7 +283,9 @@ async function addProductEntry() {
         "success"
       );
 
+      // Trigger refresh product grid di main.html
       document.dispatchEvent(new CustomEvent('productAdded'));
+
       isEditing = false;
       editingId = null;
     } else {
@@ -243,84 +296,5 @@ async function addProductEntry() {
     console.error("Error saving product:", error);
     showToast('⚠️ Network error. Please try again.', '', 'error');
   }
-
-  return false;
-}
-
-function showEditModal(product) {
-  const modal = document.getElementById('crudModal');
-  const modalContent = document.getElementById('crudModalContent');
-  const form = document.getElementById('productForm');
-
-  // isi semua field
-  form.name.value = product.name;
-  form.brand.value = product.brand;
-  form.description.value = product.description;
-  form.category.value = product.category;
-  form.thumbnail.value = product.thumbnail;
-  form.price.value = product.price;
-  form.stock.value = product.stock;
-  form.is_featured.checked = product.is_featured;
-
-  // ganti judul dan tombol
-  modal.querySelector("h3").textContent = "Edit Product";
-  const submitBtn = document.getElementById("submitProduct");
-  submitBtn.textContent = "Save Changes";
-
-  // tampilkan modal
-  modal.classList.remove('hidden');
-  setTimeout(() => {
-    modalContent.classList.remove('opacity-0', 'scale-95');
-    modalContent.classList.add('opacity-100', 'scale-100');
-  }, 50);
-
-  // ubah submit event sementara jadi edit
-  form.onsubmit = async function (e) {
-    e.preventDefault();
-    const payload = {
-      name: form.name.value,
-      brand: form.brand.value,
-      description: form.description.value,
-      category: form.category.value,
-      thumbnail: form.thumbnail.value,
-      price: form.price.value,
-      stock: form.stock.value,
-      is_featured: form.is_featured.checked,
-    };
-
-    try {
-      const response = await fetch(`/edit-product/${product.id}/`, {
-        method: "POST", // ✅ pakai POST, bukan PUT
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        showToast("✅ Product updated successfully!", "", "success");
-        hideModal();
-        fetchProducts(); // refresh grid agar update terlihat
-      } else {
-        showToast(`❌ ${data.message || "Failed to update product"}`, "", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      showToast("⚠️ Network error. Please try again.", "", "error");
-    }
-  };
-}
-
-document.getElementById("editProductForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  updateProductEntry();
 });
-
-
-document.getElementById("productForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  addProductEntry(); // fungsi JS yang kirim AJAX create product
-});
-
-
-
 </script>

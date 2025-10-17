@@ -76,9 +76,9 @@
         </div>
       </div>
 
-      <!-- Footer (Author info) -->
+      <!-- Footer (Penjual info) -->
       <div class="border-t border-gray-200 p-6 sm:p-8 bg-gray-50">
-        <p id="product-author" class="text-sm text-gray-500">Author: Loading...</p>
+        <p id="product-penjual" class="text-sm text-gray-500">Penjual: Loading...</p>
       </div>
     </article>
 
@@ -102,7 +102,7 @@ const brandEl = document.getElementById('product-brand');
 const priceEl = document.getElementById('product-price');
 const stockEl = document.getElementById('product-stock');
 const descEl = document.getElementById('product-description');
-const authorEl = document.getElementById('product-author');
+const penjualEl = document.getElementById('product-penjual');
 
 function showState(state) {
   loadingState.classList.toggle('hidden', state !== 'loading');
@@ -132,7 +132,7 @@ function renderProduct(p) {
   priceEl.textContent = `Rp ${Number(p.price).toLocaleString()}`;
   stockEl.textContent = `${p.stock} in stock`;
   descEl.textContent = p.description || 'No description available';
-  authorEl.textContent = `Author: ${p.user_username || 'Anonymous'}`;
+  penjualEl.textContent = `penjual: ${p.user_username || 'Anonymous'}`;
 }
 
 // Fetch product detail
