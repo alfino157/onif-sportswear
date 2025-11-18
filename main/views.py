@@ -13,6 +13,8 @@ from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 import json
 import datetime
+import requests
+import json
 
 # Create your views here.
 
@@ -325,6 +327,94 @@ def add_product_ajax(request):
             "success": False,
             "message": f"Error: {str(e)}"
         }, status=500)
+    
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        name = strip_tags(data.get("name", ""))
+        brand = strip_tags(data.get("brand", ""))
+        description = strip_tags(data.get("description", ""))
+        category = strip_tags(data.get("category", ""))
+        thumbnail = data.get("thumbnail", "")
+        price = data.get("price", 0)
+        stock = data.get("stock", 0)
+        is_featured = data.get("is_featured", False)
+
+        try:
+            product = Product.objects.create(
+                name=name,
+                brand=brand,
+                description=description,
+                category=category,
+                thumbnail=thumbnail,
+                price=price,
+                stock=stock,
+                is_featured=is_featured,
+                user=request.user if request.user.is_authenticated else None,
+            )
+
+            return JsonResponse({
+                "status": "success",
+                "message": "Product created successfully",
+                "id": str(product.id),
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": str(e)
+            }, status=500)
+
+    return JsonResponse({
+        "status": "error",
+        "message": "Invalid request method"
+    }, status=400)
+
+
+def show_json_my_products(request):
+    product_list = Product.objects.all().filter(user=request.user)
+    data = [
+        {
+            'id': str(product.id),
+            'name': product.name,
+            'brand': product.brand,
+            'description': product.description,
+            'category': product.category,
+            'category_display': product.get_category_display(), 
+            'thumbnail': product.thumbnail,
+            'price': product.price,
+            'stock' : product.stock,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+        }
+        for product in product_list
+    ]
+
+    return JsonResponse(data, safe=False)
+
+
+
+
     
 
 
